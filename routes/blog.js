@@ -7,10 +7,12 @@ const ObjectId = mongodb.ObjectId;
 
 const router = express.Router();
 
+// Pagina Principal
 router.get("/", function (req, res) {
   res.redirect("/posts");
 });
 
+// Mostra a lista de Posts do Blog
 router.get("/posts", async function (req, res) {
   const posts = await db
     .getDb()
@@ -22,11 +24,13 @@ router.get("/posts", async function (req, res) {
   res.render("posts-list", { posts: posts });
 });
 
+// Página de novos posts
 router.get("/new-post", async function (req, res) {
   const authors = await db.getDb().collection("authors").find().toArray();
   res.render("create-post", { authors: authors });
 });
 
+// Envio do formulário de novo post
 router.post("/posts", async function (req, res) {
   const authorId = new ObjectId(req.body.author);
   const author = await db
