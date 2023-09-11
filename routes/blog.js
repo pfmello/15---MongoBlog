@@ -24,7 +24,7 @@ router.get("/posts", async function (req, res) {
   res.render("posts-list", { posts: posts });
 });
 
-// Página de novos posts
+// Formulário de escrever novos posts
 router.get("/new-post", async function (req, res) {
   const authors = await db.getDb().collection("authors").find().toArray();
   res.render("create-post", { authors: authors });
