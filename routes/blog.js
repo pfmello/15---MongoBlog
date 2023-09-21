@@ -15,10 +15,10 @@ router.get("/posts", async function (req, res) {
   const posts = await db
     .getDb()
     .collection("posts")
-    .find({}, { title: 1, summary: 1, "author.name": 1 })
+    .find({})
+    .project({ title: 1, summary: 1, "author.name": 1 })
     .toArray();
 
-  console.log(posts);
   res.render("posts-list", { posts: posts });
 });
 
@@ -48,6 +48,30 @@ router.post("/posts", async function (req, res) {
 
   const result = await db.getDb().collection("posts").insertOne(newPost);
   res.redirect("/posts");
+});
+
+router.get("/posts/:id", async function (req, res) {
+  postId = new ObjectId(req.params.id);
+
+  const thisPost = await db
+    .getDb()
+    .collection("posts")
+    .findOne({ _id: postId }, { summary: 0 });
+
+  if (!thisPost) return res.status(404).render("404");
+
+  thisPost.humanReadable = thisPost.date.toLocaleDateString("pt-BR", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  thisPost.date = thisPost.date.toIsoString();
+
+  console.log(thisPost.humanReadable);
+
+  res.render("post-detail", { post: thisPost });
 });
 
 module.exports = router;
