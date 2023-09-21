@@ -74,4 +74,43 @@ router.get("/posts/:id", async function (req, res) {
   res.render("post-detail", { post: thisPost });
 });
 
+router.get("/posts/:id/edit", async function (req, res) {
+  postId = new ObjectId(req.params.id);
+
+  const thisPost = await db
+    .getDb()
+    .collection("posts")
+    .findOne({ _id: postId });
+
+  res.render("update-post", { post: thisPost });
+});
+
+router.post("/posts/:id/edit", async function (req, res) {
+  postId = new ObjectId(req.params.id);
+
+  const query = await db
+    .getDb()
+    .collection("posts")
+    .updateOne(
+      { _id: postId },
+      {
+        $set: {
+          title: req.body.title,
+          summary: req.body.summary,
+          body: req.body.content,
+        },
+      }
+    );
+
+  res.redirect("/posts");
+});
+
+router.post("/posts/:id/delete", async function (req, res) {
+  postId = new ObjectId(req.params.id);
+
+  const query = await db.getDb().collection("posts").deleteOne({ _id: postId });
+
+  res.redirect("/posts");
+});
+
 module.exports = router;
