@@ -9,8 +9,8 @@
     <%- include('includes/header') %>
     <main id="all-posts">
       <h1>All Posts</h1>
-      <% if (!posts) {%>
-
+      <% if (posts.length === 0) { %>
+      <p><%= posts %></p>
       <h2>No posts yet !</h2>
 
       <% } else { %>

@@ -50,8 +50,15 @@ router.post("/posts", async function (req, res) {
   res.redirect("/posts");
 });
 
-router.get("/posts/:id", async function (req, res) {
-  postId = new ObjectId(req.params.id);
+router.get("/posts/:id", async function (req, res, next) {
+  postId = req.params.id;
+
+  try {
+    postId = new ObjectId(req.params.id);
+  } catch (error) {
+    res.status("404").render("404");
+    // return next(error);
+  }
 
   const thisPost = await db
     .getDb()
@@ -67,9 +74,7 @@ router.get("/posts/:id", async function (req, res) {
     day: "numeric",
   });
 
-  thisPost.date = thisPost.date.toIsoString();
-
-  console.log(thisPost.humanReadable);
+  thisPost.date = thisPost.date.toISOString();
 
   res.render("post-detail", { post: thisPost });
 });
@@ -81,6 +86,8 @@ router.get("/posts/:id/edit", async function (req, res) {
     .getDb()
     .collection("posts")
     .findOne({ _id: postId });
+
+  if (!thisPost) return res.status(404).render("404");
 
   res.render("update-post", { post: thisPost });
 });
@@ -98,6 +105,7 @@ router.post("/posts/:id/edit", async function (req, res) {
           title: req.body.title,
           summary: req.body.summary,
           body: req.body.content,
+          date: new Date(),
         },
       }
     );
